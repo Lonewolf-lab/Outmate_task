@@ -54,11 +54,9 @@ class CallRequest(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    groq_key = os.getenv("GROQ_API_KEY", "")
-    masked = groq_key[:8] if len(groq_key) >= 8 else "NOT SET"
     print("=" * 50)
     print("GTM Intelligence API running")
-    print(f"GROQ_API_KEY loaded: {masked}...")
+    print(f"GROQ_API_KEY loaded successfully")
     print("=" * 50)
     yield
 
