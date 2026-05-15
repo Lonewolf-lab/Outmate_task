@@ -10,12 +10,7 @@ export async function runSearch(keyword: string): Promise<SearchResponse> {
   })
   
   if (!response.ok) {
-    let errMsg = 'Failed to run search'
-    try {
-      const errData = await response.json()
-      errMsg = errData.detail || errData.message || errMsg
-    } catch (e) {}
-    throw new Error(errMsg)
+    throw new Error('Failed to run search')
   }
   
   return response.json()

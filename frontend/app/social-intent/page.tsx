@@ -25,7 +25,6 @@ export default function SocialIntentAgent() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [callStatus, setCallStatus] = useState<string | null>(null);
   const [callId, setCallId] = useState<string | null>(null);
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
@@ -37,7 +36,6 @@ export default function SocialIntentAgent() {
     if (!searchKw.trim()) return;
     setHasSearched(true);
     setLoading(true);
-    setError(null);
     setKeyword("");
     setSelectedLead(null);
     setCallStatus(null);
@@ -46,9 +44,8 @@ export default function SocialIntentAgent() {
     try {
       const response = await runSearch(searchKw);
       setLeads(mapLeads(response.leads));
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "An error occurred while fetching leads.");
+    } catch (error) {
+      console.error(error);
       setLeads([]);
     } finally {
       setLoading(false);
@@ -289,14 +286,6 @@ export default function SocialIntentAgent() {
                   <div className="h-8 rounded" style={{ background: '#F0D8B8' }}></div>
                 </div>
               ))}
-            </div>
-          ) : error ? (
-            <div className="flex flex-col items-center justify-center h-full min-h-[300px]">
-              <div style={{ color: '#D3A376', marginBottom: 12 }}>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-              </div>
-              <p className="text-sm font-semibold" style={{ color: '#3E2522', marginBottom: 4 }}>Error fetching leads</p>
-              <p className="text-xs" style={{ color: '#B09080', maxWidth: 300, textAlign: 'center' }}>{error}</p>
             </div>
           ) : leads.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[300px]">

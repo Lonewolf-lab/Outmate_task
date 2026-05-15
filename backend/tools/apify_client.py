@@ -79,10 +79,12 @@ class ApifyClient:
                     if status == "SUCCEEDED":
                         break
                     if status in ["FAILED", "ABORTED", "TIMED-OUT"]:
-                        raise Exception(f"APIFY RUN FAILED with status: {status}")
+                        print(f"APIFY RUN FAILED with status: {status}")
+                        return []
 
                 if elapsed >= max_time:
-                    raise Exception("APIFY TIMEOUT: run did not complete in time")
+                    print("APIFY TIMEOUT: run did not complete in time")
+                    return []
 
                 dataset_url = f"https://api.apify.com/v2/datasets/{default_dataset_id}/items?limit=5"
                 dataset_response = await client.get(dataset_url, headers=headers)
@@ -98,4 +100,4 @@ class ApifyClient:
 
         except Exception as e:
             print(f"APIFY ERROR: {type(e).__name__}: {str(e)}")
-            raise e
+            return []
