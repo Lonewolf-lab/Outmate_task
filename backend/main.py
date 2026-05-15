@@ -84,6 +84,13 @@ app.add_middleware(
 
 # ── Routes ────────────────────────────────────────────────────────────────────
 
+@app.get("/")
+async def root():
+    return {
+        "status": "Backend is running",
+        "service": "Outmate AI GTM Intelligence API"
+    }
+    
 @app.get("/health")
 async def health_check() -> dict:
     return {"status": "ok", "service": "GTM Intelligence API"}
