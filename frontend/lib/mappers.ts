@@ -45,7 +45,7 @@ export interface GTMResponse {
   gtm_strategy: {
     hooks: string[]
     angles: string[]
-    email_snippets: unknown[]
+    email_snippets: {company: string; subject: string; body: string}[]
   }
   confidence: number
   reasoning_trace: TraceEntry[]

@@ -30,7 +30,7 @@ export default function GTMPage() {
     try {
       const data = await runGTM(query);
       if ('error' in data && data.error) {
-        setError(data.message || "An error occurred");
+        setError((data as any).message || (data as any).error || "An error occurred");
         if (data.reasoning_trace) setGTMResult(data as GTMResponse);
       } else {
         setGTMResult(data as GTMResponse);

@@ -138,7 +138,7 @@ export function GTMResults({ result, activeTab }: Props) {
           {result.gtm_strategy.email_snippets?.length > 0 && (
             <div>{sLabel("Email Snippets")}
               <div className="grid md:grid-cols-2 gap-4">
-                {result.gtm_strategy.email_snippets.map((sn: {company:string;subject:string;body:string}, i) => (
+                {(result.gtm_strategy.email_snippets as {company:string;subject:string;body:string}[]).map((sn, i) => (
                   <div key={i} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:12, padding:'20px 22px', display:'flex', flexDirection:'column' }}>
                     <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14, paddingBottom:14, borderBottom:`1px solid ${C.bs}` }}>
                       <div style={{ width:32, height:32, borderRadius:'50%', background:'rgba(17,98,100,0.12)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
@@ -171,7 +171,7 @@ export function GTMResults({ result, activeTab }: Props) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {result.results.map((co: Record<string,unknown>, idx) => {
+              {(result.results as Record<string,unknown>[]).map((co, idx) => {
                 const score = co.intent_score as number | undefined;
                 const scoreColor = score !== undefined ? getConfidenceColor(score/100) : C.muted;
                 const dqColor = co.data_quality === 'high' ? C.success : co.data_quality === 'medium' ? C.accent : C.hot;
@@ -184,7 +184,7 @@ export function GTMResults({ result, activeTab }: Props) {
                       <div>
                         <h3 style={{ color:C.linen, fontWeight:700, fontSize:15, marginBottom:6, display:'flex', alignItems:'center', gap:8 }}>
                           {String(co.name)}
-                          {co.data_quality && <span style={{ fontFamily:mono, fontSize:9, letterSpacing:1, padding:'2px 6px', borderRadius:4, border:`1px solid ${dqColor}`, color:dqColor, background: dqColor === C.success ? 'rgba(74,140,106,0.08)' : dqColor === C.accent ? 'rgba(181,136,99,0.08)' : 'rgba(192,97,74,0.08)' }}>{String(co.data_quality).toUpperCase()}</span>}
+                          {co.data_quality ? <span style={{ fontFamily:mono, fontSize:9, letterSpacing:1, padding:'2px 6px', borderRadius:4, border:`1px solid ${dqColor}`, color:dqColor, background: dqColor === C.success ? 'rgba(74,140,106,0.08)' : dqColor === C.accent ? 'rgba(181,136,99,0.08)' : 'rgba(192,97,74,0.08)' }}>{String(co.data_quality).toUpperCase()}</span> : null}
                         </h3>
                         <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
                           {['industry','region','size','funding_stage'].map(k => co[k] ? (
@@ -207,18 +207,18 @@ export function GTMResults({ result, activeTab }: Props) {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3" style={{ marginBottom:12 }}>
-                      {co.hiring_signal && (
+                      {co.hiring_signal ? (
                         <div style={{ background:'rgba(74,140,106,0.06)', border:'1px solid rgba(74,140,106,0.2)', borderRadius:8, padding:'10px 12px' }}>
                           <span style={{ display:'block', fontFamily:mono, fontSize:9, letterSpacing:1.5, color:C.success, marginBottom:4 }}>HIRING</span>
                           <span style={{ fontSize:12, color:C.warm }}>{String(co.hiring_signal)}</span>
                         </div>
-                      )}
-                      {co.growth_signal && (
+                      ) : null}
+                      {co.growth_signal ? (
                         <div style={{ background:'rgba(17,98,100,0.06)', border:'1px solid rgba(17,98,100,0.2)', borderRadius:8, padding:'10px 12px' }}>
                           <span style={{ display:'block', fontFamily:mono, fontSize:9, letterSpacing:1.5, color:C.teal, marginBottom:4 }}>GROWTH</span>
                           <span style={{ fontSize:12, color:C.warm }}>{String(co.growth_signal)}</span>
                         </div>
-                      )}
+                      ) : null}
                     </div>
 
                     {Array.isArray(co.tech_stack) && co.tech_stack.length > 0 && (
