@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --card: #F1F5F9;
+  --accent: #6366F1;
+  --accent2: #8B5CF6;
+  --hot: #EF4444;
+  --warm: #F59E0B;
+  --cold: #64748B;
+  --success: #10B981;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border: #E2E8F0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+}

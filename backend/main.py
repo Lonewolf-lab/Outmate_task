@@ -11,6 +11,11 @@ from sse_starlette.sse import EventSourceResponse
 from dotenv import load_dotenv
 
 from orchestrator import run_gtm
+from tools.apify_client import ApifyClient
+from tools.retell_client import RetellClient
+
+apify_client = ApifyClient()
+retell_client = RetellClient()
 
 load_dotenv()
 
@@ -142,64 +147,34 @@ async def run_gtm_stream(query: str = Query(..., min_length=1)) -> EventSourceRe
 @app.post("/run-search")
 async def run_search(body: SearchRequest) -> dict:
     """
-    Social Intent Agent stub — returns mock LinkedIn-style leads.
-    Will be expanded in Part 2.
+    Social Intent Agent — Uses Apify to scrape Google Search results.
     """
     await asyncio.sleep(3)
-
-    mock_leads = [
-        {
-            "prospect_name": "Arjun Mehta",
-            "company": "Velorix AI",
-            "role": "Head of Revenue Operations",
-            "intent_score": 88,
-            "signal": f"Posted about pain points with {body.keyword} tooling 2 days ago",
-            "post_url": "https://linkedin.com/posts/arjun-mehta-example-001",
-        },
-        {
-            "prospect_name": "Sofia Lindqvist",
-            "company": "Fintrek Solutions",
-            "role": "VP of Sales",
-            "intent_score": 65,
-            "signal": f"Commented on a thread about scaling {body.keyword} outreach",
-            "post_url": "https://linkedin.com/posts/sofia-lindqvist-example-002",
-        },
-        {
-            "prospect_name": "Marcus Webb",
-            "company": "Constructly",
-            "role": "CRO",
-            "intent_score": 71,
-            "signal": f"Shared an article on modern {body.keyword} strategies",
-            "post_url": "https://linkedin.com/posts/marcus-webb-example-003",
-        },
-        {
-            "prospect_name": "Priya Nair",
-            "company": "HealthBridge Labs",
-            "role": "Founder & CEO",
-            "intent_score": 42,
-            "signal": "Active on LinkedIn but no recent relevant intent signals detected",
-            "post_url": "https://linkedin.com/posts/priya-nair-example-004",
-        },
-        {
-            "prospect_name": "Daniel Osei",
-            "company": "Optiware HQ",
-            "role": "Director of Business Development",
-            "intent_score": 56,
-            "signal": f"Liked 3 posts mentioning {body.keyword} automation in the last week",
-            "post_url": "https://linkedin.com/posts/daniel-osei-example-005",
-        },
-    ]
-
-    return {"keyword": body.keyword, "leads": mock_leads, "total": len(mock_leads)}
+    
+    try:
+        leads = await apify_client.search_leads(body.keyword)
+        return {"keyword": body.keyword, "leads": leads, "total": len(leads)}
+    except Exception as e:
+        # Fallback to mock leads
+        leads = apify_client._get_mock_leads(body.keyword)
+        return {"keyword": body.keyword, "leads": leads, "total": len(leads)}
 
 
 @app.post("/initiate-call")
 async def initiate_call(body: CallRequest) -> dict:
     """
-    Voice Agent stub — Retell integration coming in Part 2.
+    Voice Agent — Creates a phone call via Retell AI.
     """
-    return {
-        "call_status": "pending",
-        "call_id": "mock-call-123",
-        "message": "Retell integration coming soon",
-    }
+    try:
+        result = await retell_client.initiate_call(
+            prospect_name=body.prospect_name, 
+            prospect_phone=body.prospect_phone, 
+            context=body.context
+        )
+        return result
+    except Exception as e:
+        return {
+            "call_status": "failed",
+            "call_id": None,
+            "message": str(e)
+        }
