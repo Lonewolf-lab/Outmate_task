@@ -9,7 +9,7 @@ class GroqClient:
     def __init__(self):
         self.api_key = os.getenv("GROQ_API_KEY")
         self.client = AsyncGroq(api_key=self.api_key)
-        self.model="llama-3.1-8b-instant"
+        self.model="llama-3.3-70b-versatile"
 
     async def complete(self, system_prompt: str, user_prompt: str) -> dict:
         raw_content = ""
