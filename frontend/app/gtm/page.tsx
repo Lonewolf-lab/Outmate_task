@@ -53,14 +53,14 @@ export default function GTMPage() {
           borderRadius: 8, display: 'flex', alignItems: 'center', gap: 6,
           border: active ? '1px solid #E8C9A0' : '1px solid transparent',
           background: active ? '#FFF8EF' : 'transparent',
-          color: active ? '#3E2522' : '#B09080',
+          color: active ? '#1c1917' : '#b45309',
           boxShadow: active ? '0 1px 4px rgba(140,110,99,0.15)' : 'none',
           cursor: 'pointer', transition: 'all 150ms',
         }}
-        onMouseEnter={e => { if (!active) { e.currentTarget.style.color = '#8C6E63'; e.currentTarget.style.background = 'rgba(211,163,118,0.08)'; } }}
-        onMouseLeave={e => { if (!active) { e.currentTarget.style.color = '#B09080'; e.currentTarget.style.background = 'transparent'; } }}
+        onMouseEnter={e => { if (!active) { e.currentTarget.style.color = '#92400e'; e.currentTarget.style.background = 'rgba(211,163,118,0.08)'; } }}
+        onMouseLeave={e => { if (!active) { e.currentTarget.style.color = '#b45309'; e.currentTarget.style.background = 'transparent'; } }}
       >
-        <span style={{ color: active ? '#D3A376' : '#B09080', display: 'flex' }}>{icon}</span>
+        <span style={{ color: active ? '#D3A376' : '#b45309', display: 'flex' }}>{icon}</span>
         {label}
       </button>
     );
@@ -88,11 +88,11 @@ export default function GTMPage() {
 
       {/* Hero & Query Input */}
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '48px 24px 40px', textAlign: 'center' }}>
-        <h1 style={{ fontFamily: mono, fontWeight: 800, fontSize: 42, letterSpacing: -2, color: '#3E2522', marginBottom: 16 }}>
+        <h1 style={{ fontFamily: mono, fontWeight: 800, fontSize: 42, letterSpacing: -2, color: '#1c1917', marginBottom: 16 }}>
           GTM Intelligence
         </h1>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32, height: 24 }}>
-          <p className="typing-effect" style={{ color: '#8C6E63', fontSize: 14, fontWeight: 500 }}>
+          <p className="typing-effect" style={{ color: '#b45309', fontSize: 14, fontWeight: 500 }}>
             AI-powered go-to-market research and strategy generation
           </p>
         </div>
@@ -109,7 +109,7 @@ export default function GTMPage() {
               placeholder="e.g. Find high-growth AI SaaS companies in the US and generate personalized outbound hooks for their VP Sales"
               style={{
                 width: '100%', padding: '20px 24px', borderRadius: 16, fontSize: 15, lineHeight: 1.7,
-                background: '#FFF8EF', border: '1px solid #E8C9A0', color: '#3E2522', resize: 'none',
+                background: '#FFF8EF', border: '1px solid #E8C9A0', color: '#1c1917', resize: 'none',
                 outline: 'none', transition: 'border-color 200ms, box-shadow 200ms',
                 fontFamily: 'var(--font-geist-sans)',
               }}
@@ -122,9 +122,9 @@ export default function GTMPage() {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '16px 0 20px' }}>
             {exampleQueries.map((q, i) => (
               <button key={i} onClick={() => setQuery(q)}
-                style={{ padding: '6px 14px', background: 'transparent', border: '1px solid #E8C9A0', borderRadius: 100, fontSize: 11, letterSpacing: 0.2, color: '#8C6E63', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 200ms' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#D3A376'; e.currentTarget.style.color = '#3E2522'; e.currentTarget.style.background = 'rgba(211,163,118,0.1)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8C9A0'; e.currentTarget.style.color = '#8C6E63'; e.currentTarget.style.background = 'transparent'; }}
+                style={{ padding: '6px 14px', background: 'transparent', border: '1px solid #E8C9A0', borderRadius: 100, fontSize: 11, letterSpacing: 0.2, color: '#3D1F00', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 200ms' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#D3A376'; e.currentTarget.style.color = '#1c1917'; e.currentTarget.style.background = 'rgba(211,163,118,0.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8C9A0'; e.currentTarget.style.color = '#3D1F00'; e.currentTarget.style.background = 'transparent'; }}
               >
                 <span style={{ color: '#D3A376' }}>→</span> {q}
               </button>
@@ -158,7 +158,7 @@ export default function GTMPage() {
         {error && (
           <div style={{ marginBottom: 32, background: 'rgba(192,97,74,0.08)', border: '1px solid rgba(192,97,74,0.3)', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
             <AlertCircle style={{ width: 18, height: 18, color: '#C0614A', flexShrink: 0, marginTop: 2 }} />
-            <div style={{ fontSize: 13, color: '#3E2522', fontWeight: 500 }}>{error}</div>
+            <div style={{ fontSize: 13, color: '#1c1917', fontWeight: 500 }}>{error}</div>
           </div>
         )}
 
@@ -173,14 +173,14 @@ export default function GTMPage() {
             <div style={{ width: 72, height: 72, background: 'rgba(211,163,118,0.12)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
               <Sparkles style={{ width: 36, height: 36, color: '#D3A376', opacity: 0.4 }} />
             </div>
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: '#B09080', marginBottom: 28, fontFamily: mono }}>Run your first GTM analysis</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1c1917', marginBottom: 28, fontFamily: mono }}>Run your first GTM analysis</h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 12 }}>
               {[
                 { icon: <Search style={{ width: 14, height: 14, color: '#D3A376' }} />, text: 'Find matching companies' },
                 { icon: <BarChart2 style={{ width: 14, height: 14, color: '#D3A376' }} />, text: 'Generate Sales Angles' },
                 { icon: <Mail style={{ width: 14, height: 14, color: '#D3A376' }} />, text: 'Draft Outreach Hooks' },
               ].map((item, i) => (
-                <div key={i} style={{ background: '#FFEBD0', border: '1px solid #E8C9A0', borderRadius: 10, padding: '10px 16px', fontSize: 13, color: '#8C6E63', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div key={i} style={{ background: '#FFEBD0', border: '1px solid #E8C9A0', borderRadius: 10, padding: '10px 16px', fontSize: 13, color: '#3D1F00', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
                   {item.icon} {item.text}
                 </div>
               ))}

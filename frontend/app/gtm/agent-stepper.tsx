@@ -15,8 +15,8 @@ const STEPS: { key: string[]; label: string; short: string; emoji: string }[] = 
 const P = {
   bg: '#FFF2DF', surface: '#FFF8EF', s2: '#FFE0B2', card: '#FFEBD0',
   border: '#E8C9A0', lineBg: '#E8C9A0',
-  accent: '#D3A376', teal: '#8C6E63',
-  muted: '#B09080', warm: '#8C6E63', linen: '#3E2522',
+  accent: '#D3A376', teal: '#92400e',
+  muted: '#92400e', warm: '#3D1F00', linen: '#1c1917',
   hot: '#C0614A', success: '#4A8C6A',
   logBg: '#FFF8EF',
 };
@@ -139,9 +139,9 @@ export function AgentStepper({ loading, result }: AgentStepperProps) {
     const isAnimActive = activeAnimIndex === idx;
     const isTraceActive = !noTraceYet && loading && idx === activeStepForStatus;
     if (step.state === "success" || (loading && noTraceYet && idx < activeAnimIndex)) return P.accent;
-    if (isAnimActive || isTraceActive) return P.linen;
+    if (isAnimActive || isTraceActive) return '#1c1917';
     if (step.state === "failed") return P.hot;
-    return P.muted;
+    return '#b45309';
   };
 
   return (
@@ -232,10 +232,10 @@ export function AgentStepper({ loading, result }: AgentStepperProps) {
               {result?.reasoning_trace?.length ? (
                 result.reasoning_trace.map((trace, idx) => (
                   <div key={idx} style={{ display:'flex', gap:10, alignItems:'flex-start' }}>
-                    <span style={{ fontFamily:'var(--font-geist-mono)', fontSize:10, color:P.muted, whiteSpace:'nowrap', marginTop:1 }}>
+                    <span style={{ fontFamily:'var(--font-geist-mono)', fontSize:10, color:'#b45309', whiteSpace:'nowrap', marginTop:1 }}>
                       {new Date(trace.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' })}
                     </span>
-                    <span style={{ fontFamily:'var(--font-geist-mono)', fontSize:10, color: trace.status === 'success' ? '#4A8C6A' : trace.status === 'failed' ? '#C0614A' : trace.status === 'retrying' ? P.accent : P.warm }}>
+                    <span style={{ fontFamily:'var(--font-geist-mono)', fontSize:10, color: trace.status === 'success' ? '#4A8C6A' : trace.status === 'failed' ? '#C0614A' : trace.status === 'retrying' ? P.accent : '#1c1917' }}>
                       [{trace.agent}]
                     </span>
                     <span style={{ fontFamily:'var(--font-geist-mono)', fontSize:10, color:P.teal, flex:1 }}>

@@ -3,7 +3,7 @@ import { GTMResponse } from "@/lib/mappers";
 import { CheckCircle2, XCircle, AlertCircle, RefreshCw, BarChart2, Building2, List, Mail } from "lucide-react";
 
 const mono = 'var(--font-geist-mono)';
-const C = { bg:'#FFF2DF', surface:'#FFF8EF', s2:'#FFE0B2', card:'#FFEBD0', border:'#E8C9A0', bs:'#F0D8B8', accent:'#D3A376', teal:'#8C6E63', muted:'#B09080', warm:'#8C6E63', linen:'#3E2522', hot:'#C0614A', success:'#4A8C6A', input:'#FFF8EF', logBg:'#FFF8EF', lineBg:'#E8C9A0' };
+const C = { bg:'#FFF2DF', surface:'#FFF8EF', s2:'#FFE0B2', card:'#FFEBD0', border:'#E8C9A0', bs:'#F0D8B8', accent:'#D3A376', teal:'#8C6E63', muted:'#92400e', warm:'#3D1F00', body:'#292524', linen:'#1c1917', hot:'#C0614A', success:'#4A8C6A', input:'#FFF8EF', logBg:'#FFF8EF', lineBg:'#E8C9A0' };
 
 function sLabel(text: string) {
   return <span style={{ display:'block', fontFamily:mono, fontSize:10, letterSpacing:2, textTransform:'uppercase' as const, color:C.muted, fontWeight:600, marginBottom:12 }}>{text}</span>;
@@ -72,7 +72,7 @@ export function GTMResults({ result, activeTab }: Props) {
             <div>{sLabel("Outreach Hooks")}
               <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
                 {result.gtm_strategy.hooks.map((hook, i) => (
-                  <div key={i} style={{ background:C.input, borderLeft:'3px solid #B58863', border:'1px solid #1E2A30', borderLeftWidth:3, borderLeftColor:'#B58863', borderRadius:10, padding:'14px 16px', color:C.linen, fontSize:13, lineHeight:1.7 }}>{hook}</div>
+                  <div key={i} style={{ background:C.input, borderLeft:'3px solid #B58863', border:'1px solid #1E2A30', borderLeftWidth:3, borderLeftColor:'#B58863', borderRadius:10, padding:'14px 16px', color:C.body, fontSize:13, lineHeight:1.7 }}>{hook}</div>
                 ))}
               </div>
             </div>
@@ -83,7 +83,7 @@ export function GTMResults({ result, activeTab }: Props) {
             <div>{sLabel("Sales Angles")}
               <ul style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:12, padding:'20px 24px', display:'flex', flexDirection:'column', gap:14, listStyle:'none', margin:0 }}>
                 {result.gtm_strategy.angles.map((a, i) => (
-                  <li key={i} style={{ display:'flex', gap:10, fontSize:13, color:C.warm, alignItems:'flex-start' }}>
+                  <li key={i} style={{ display:'flex', gap:10, fontSize:13, color:C.body, alignItems:'flex-start' }}>
                     <span style={{ color:C.teal, marginTop:2, fontSize:10 }}>◆</span>
                     <span style={{ lineHeight:1.7 }}>{a}</span>
                   </li>
@@ -99,7 +99,7 @@ export function GTMResults({ result, activeTab }: Props) {
                 {Object.entries(result.persona_strategies).map(([persona, strategy], idx) => (
                   <div key={idx} style={{ background:C.card, border:`1px solid ${C.border}`, borderTop:`4px solid ${personaColors[idx%3]}`, borderRadius:12, padding:'20px 18px', display:'flex', flexDirection:'column' }}>
                     <div style={{ fontFamily:mono, fontSize:10, letterSpacing:2, textTransform:'uppercase', color:C.muted, fontWeight:700, marginBottom:14, paddingBottom:14, borderBottom:`1px solid ${C.bs}` }}>{persona.replace(/_/g," ")}</div>
-                    <p style={{ fontSize:13, color:C.warm, lineHeight:1.7, flex:1 }}>{String(strategy)}</p>
+                    <p style={{ fontSize:13, color:C.body, lineHeight:1.7, flex:1 }}>{String(strategy)}</p>
                   </div>
                 ))}
               </div>
@@ -123,7 +123,7 @@ export function GTMResults({ result, activeTab }: Props) {
                     <span style={{ display:'block', fontFamily:mono, fontSize:10, letterSpacing:2, textTransform:'uppercase', color:C.muted, fontWeight:700, marginBottom:14 }}>Pain Points</span>
                     <ul className="grid md:grid-cols-2 gap-3" style={{ listStyle:'none', margin:0, padding:0 }}>
                       {((result.icp_insights as Record<string,unknown>).pain_points as string[]).map((pt,i) => (
-                        <li key={i} style={{ display:'flex', gap:8, fontSize:13, color:C.warm, alignItems:'flex-start' }}>
+                        <li key={i} style={{ display:'flex', gap:8, fontSize:13, color:C.body, alignItems:'flex-start' }}>
                           <XCircle style={{ width:14, height:14, color:C.hot, flexShrink:0, marginTop:2 }}/> {pt}
                         </li>
                       ))}
@@ -150,7 +150,7 @@ export function GTMResults({ result, activeTab }: Props) {
                       </div>
                     </div>
                     <div style={{ background:C.input, border:`1px solid ${C.lineBg}`, borderRadius:8, padding:14, flex:1 }}>
-                      <p style={{ fontFamily:mono, fontSize:11, color:C.warm, whiteSpace:'pre-wrap', lineHeight:1.8, margin:0 }}>{sn.body}</p>
+                      <p style={{ fontFamily:mono, fontSize:11, color:C.body, whiteSpace:'pre-wrap', lineHeight:1.8, margin:0 }}>{sn.body}</p>
                     </div>
                   </div>
                 ))}
@@ -166,8 +166,8 @@ export function GTMResults({ result, activeTab }: Props) {
           {result.results.length === 0 ? (
             <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:12, padding:'48px 24px', textAlign:'center' }}>
               <Building2 style={{ width:48, height:48, color:'#2A3540', margin:'0 auto 16px' }}/>
-              <h3 style={{ color:C.warm, fontWeight:600, fontSize:16, marginBottom:4 }}>No matches found</h3>
-              <p style={{ color:C.muted, fontSize:13 }}>Try adjusting your query.</p>
+              <h3 style={{ color:C.linen, fontWeight:600, fontSize:16, marginBottom:4 }}>No matches found</h3>
+              <p style={{ color:C.warm, fontSize:13 }}>Try adjusting your query.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -188,7 +188,7 @@ export function GTMResults({ result, activeTab }: Props) {
                         </h3>
                         <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
                           {['industry','region','size','funding_stage'].map(k => co[k] ? (
-                            <span key={k} style={{ fontFamily:mono, fontSize:11, padding:'2px 8px', borderRadius:6, background:C.s2, border:`1px solid ${C.border}`, color:'#7A8A92' }}>{String(co[k])}</span>
+                            <span key={k} style={{ fontFamily:mono, fontSize:11, padding:'2px 8px', borderRadius:6, background:C.s2, border:`1px solid ${C.border}`, color:C.muted }}>{String(co[k])}</span>
                           ) : null)}
                         </div>
                       </div>
@@ -244,12 +244,12 @@ export function GTMResults({ result, activeTab }: Props) {
             <div key={idx} style={{ background:C.logBg, border:`1px solid ${C.lineBg}`, borderRadius:10, padding:'16px 20px' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14, paddingBottom:14, borderBottom:`1px solid ${C.lineBg}` }}>
                 <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                  <span style={{ fontFamily:mono, fontSize:13, color:C.accent, fontWeight:700 }}>{'>'} {trace.agent.replace(/Agent$/, '')}_Agent</span>
+                  <span style={{ fontFamily:mono, fontSize:13, color:C.linen, fontWeight:700 }}>{'>'} {trace.agent.replace(/Agent$/, '')}_Agent</span>
                   {getStatusBadge(trace.status)}
                 </div>
-                <span style={{ fontFamily:mono, fontSize:10, color:'#3D4D55' }}>{new Date(trace.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' })}</span>
+                <span style={{ fontFamily:mono, fontSize:10, color:'#b45309' }}>{new Date(trace.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' })}</span>
               </div>
-              <pre style={{ fontFamily:mono, fontSize:11, color:'#7A8A92', whiteSpace:'pre-wrap', lineHeight:1.8, margin:0 }}>{trace.output_summary}</pre>
+              <pre style={{ fontFamily:mono, fontSize:11, color:C.muted, whiteSpace:'pre-wrap', lineHeight:1.8, margin:0 }}>{trace.output_summary}</pre>
             </div>
           ))}
         </div>
