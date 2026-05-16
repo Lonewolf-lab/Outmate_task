@@ -1,7 +1,6 @@
 import os
 import asyncio
 import httpx
-import random
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,33 +8,51 @@ load_dotenv()
 class ApifyClient:
     def __init__(self):
         self.api_token = os.getenv("APIFY_API_TOKEN")
-        self.actor_id = "harvestapi~linkedin-profile-search"
+        self.actor_id = "harvestapi~linkedin-post-search"
 
     def _map_item(self, item: dict, keyword: str) -> dict:
-        first = item.get("firstName", "")
-        last = item.get("lastName", "")
-        name = f"{first} {last}".strip() or "Unknown"
+        author = item.get("author") or {}
+        name = author.get("name", "Unknown")
+        info = author.get("info") or ""
+        author_url = author.get("linkedinUrl") or ""
+        avatar_data = author.get("avatar") or {}
+        avatar = avatar_data.get("url", "")
 
-        positions = item.get("currentPositions", [])
-        role = "Professional"
+        # Parse role and company from info field
+        role = info
         company = keyword
+        if " at " in info:
+            role = info.split(" at ")[0].strip()
+            company = info.split(" at ")[1].strip()
+        elif " | " in info:
+            role = info.split(" | ")[0].strip()
 
-        if positions:
-            role = positions[0].get("title", "Professional")
-            company = positions[0].get("companyName", keyword)
+        # Get engagement
+        engagement = item.get("engagement") or {}
+        likes = engagement.get("likes") or 0
+        comments = engagement.get("comments") or 0
 
-        summary = item.get("summary", "")
-        signal = f"Active LinkedIn professional in {keyword} space"
-        if summary:
-            signal = summary[:120].replace("\n", " ").strip() + "..."
+        # Intent score based on engagement
+        intent_score = min(100, 40 + (likes // 5) + (comments * 3))
+
+        post_text = item.get("content") or ""
+        signal = post_text[:200].replace("\n", " ").strip() + "..." if post_text else f"Active on LinkedIn discussing {keyword}"
+
+        posted_at = item.get("postedAt") or {}
 
         return {
             "prospect_name": name,
             "company": company,
             "role": role,
-            "intent_score": random.randint(40, 95),
+            "intent_score": intent_score,
             "signal": signal,
-            "post_url": item.get("linkedinUrl", "https://linkedin.com"),
+            "post_url": item.get("linkedinUrl") or "https://linkedin.com",
+            "post_text": post_text,
+            "author_linkedin_url": author_url,
+            "author_avatar": avatar,
+            "likes_count": likes,
+            "comments_count": comments,
+            "posted_at": posted_at.get("postedAgoText") or "",
         }
 
     async def search_leads(self, keyword: str) -> list:
@@ -44,13 +61,12 @@ class ApifyClient:
                 run_url = f"https://api.apify.com/v2/acts/{self.actor_id}/runs"
                 headers = {"Authorization": f"Bearer {self.api_token}"}
                 payload = {
-                    "searchQuery": keyword,
-                    "profileScraperMode": "Short",
-                    "maxItems": 5,
-                    "startPage": 1,
-                    "autoQuerySegmentation": False,
-                    "recentlyChangedJobs": False,
-                    "recentlyPostedOnLinkedIn": False
+                    "searchQueries": [keyword],
+                    "maxPosts": 5,
+                    "scrapeComments": False,
+                    "scrapeReactions": False,
+                    "postNestedComments": False,
+                    "postNestedReactions": False
                 }
 
                 run_response = await client.post(run_url, headers=headers, json=payload)
@@ -101,3 +117,33 @@ class ApifyClient:
         except Exception as e:
             print(f"APIFY ERROR: {type(e).__name__}: {str(e)}")
             return []
+
+    def _get_mock_leads(self, keyword: str) -> list:
+        return [
+            {
+                "prospect_name": "Sarah Jenkins",
+                "company": "HealthTech Solutions",
+                "role": "VP of Sales",
+                "intent_score": 85,
+                "signal": f"Just published a detailed guide on navigating {keyword} in 2024...",
+                "post_url": "https://linkedin.com",
+                "post_text": f"Just published a detailed guide on navigating {keyword} in 2024. The landscape is shifting rapidly.",
+                "author_linkedin_url": "https://linkedin.com",
+                "likes_count": 150,
+                "comments_count": 22,
+                "posted_at": "2024-05-15T10:00:00Z"
+            },
+            {
+                "prospect_name": "Michael Chen",
+                "company": "FinServe Innovators",
+                "role": "Chief Technology Officer",
+                "intent_score": 72,
+                "signal": f"Exploring new tools for {keyword}. Anyone have recommendations?",
+                "post_url": "https://linkedin.com",
+                "post_text": f"Exploring new tools for {keyword}. Anyone have recommendations? We need to scale fast.",
+                "author_linkedin_url": "https://linkedin.com",
+                "likes_count": 45,
+                "comments_count": 12,
+                "posted_at": "2024-05-14T14:30:00Z"
+            }
+        ]

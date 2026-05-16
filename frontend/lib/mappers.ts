@@ -6,6 +6,12 @@ export interface LeadRaw {
   intent_score: number
   signal: string
   post_url: string
+  post_text: string
+  author_linkedin_url: string
+  author_avatar: string
+  likes_count: number
+  comments_count: number
+  posted_at: string
 }
 
 // Mapped camelCase for frontend
@@ -16,6 +22,12 @@ export interface Lead {
   intentScore: number
   signal: string
   postUrl: string
+  postText: string
+  authorLinkedinUrl: string
+  authorAvatar: string
+  likesCount: number
+  commentsCount: number
+  postedAt: string
 }
 
 export interface CallResponse {
@@ -63,7 +75,13 @@ export function mapLead(raw: LeadRaw): Lead {
     role: raw.role,
     intentScore: raw.intent_score,
     signal: raw.signal,
-    postUrl: raw.post_url
+    postUrl: raw.post_url,
+    postText: raw.post_text,
+    authorLinkedinUrl: raw.author_linkedin_url,
+    authorAvatar: raw.author_avatar,
+    likesCount: raw.likes_count,
+    commentsCount: raw.comments_count,
+    postedAt: raw.posted_at
   }
 }
 

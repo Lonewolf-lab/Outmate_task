@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { runSearch, initiateCall } from "@/lib/api";
 import { Lead, mapLeads } from "@/lib/mappers";
-import { Clock, Search, User, Loader2, Phone, ExternalLink, Flame, Zap, Snowflake, ArrowRight } from "lucide-react";
+import { Clock, Search, User, Loader2, Phone, ExternalLink, Flame, Zap, Snowflake, ArrowRight, X, ThumbsUp, MessageSquare } from "lucide-react";
 
 interface CallLog {
   callId: string;
@@ -109,6 +109,12 @@ export default function SocialIntentAgent() {
     );
   };
 
+  const getInitials = (name: string) => {
+    const p = name.split(" ");
+    if (p.length >= 2) return (p[0][0] + p[1][0]).toUpperCase();
+    return name ? name[0].toUpperCase() : "U";
+  };
+
   // ─── HERO / EMPTY STATE ────────────────────────────────────────────────────
   if (!hasSearched) {
     return (
@@ -148,7 +154,7 @@ export default function SocialIntentAgent() {
         <p className="si-hero-3" style={{
           color: '#8C6E63', fontSize: 15, marginBottom: 40, textAlign: 'center', maxWidth: 460,
         }}>
-          Find high-intent prospects from LinkedIn signals and initiate AI-powered outreach instantly.
+          Find prospects actively discussing your keywords on LinkedIn and initiate AI-powered outreach instantly.
         </p>
 
         {/* Search bar */}
@@ -218,72 +224,79 @@ export default function SocialIntentAgent() {
     <div className="flex overflow-hidden" style={{ height: 'calc(100vh - 112px)', background: '#FFF2DF' }}>
 
       {/* Left — Past Searches */}
-      <div className="w-60 overflow-y-auto flex flex-col shrink-0" style={{ borderRight: '1px solid #E8C9A0', background: '#FFF8EF' }}>
-        <div className="px-4 py-4" style={{ borderBottom: '1px solid #F0D8B8' }}>
-          <h2 className="text-[10px] font-semibold uppercase tracking-widest flex items-center gap-2" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>
-            <Clock className="w-3.5 h-3.5" style={{ color: '#D3A376' }} /> Searches
+      <div className="w-64 overflow-y-auto flex flex-col shrink-0" style={{ borderRight: '1px solid #E8C9A0', background: '#FFF8EF' }}>
+        <div className="px-5 py-5" style={{ borderBottom: '1px solid #F0D8B8' }}>
+          <h2 className="text-xs font-semibold uppercase tracking-widest flex items-center gap-2" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>
+            <Clock className="w-4 h-4" style={{ color: '#D3A376' }} /> Search History
           </h2>
         </div>
-        <div className="p-3 flex-1">
-          <div className="flex flex-col gap-1">
-            {searches.map((s, idx) => (
-              <button key={idx} onClick={() => handleSearchSubmit(s)}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all"
-                style={{ color: '#8C6E63' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(211,163,118,0.12)'; e.currentTarget.style.color = '#3E2522'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#8C6E63'; }}
-              >
-                <span style={{ color: '#D3A376', marginRight: 6 }}>›</span>{s}
-              </button>
-            ))}
-          </div>
+        <div className="p-4 flex-1">
+          {searches.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full opacity-50">
+               <Search className="w-8 h-8 mb-2" style={{ color: '#D3A376' }} />
+               <p className="text-xs" style={{ fontFamily: 'var(--font-geist-mono)', color: '#B09080' }}>No search history</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {searches.map((s, idx) => (
+                <button key={idx} onClick={() => handleSearchSubmit(s)}
+                  className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all"
+                  style={{ color: '#8C6E63', background: 'rgba(211,163,118,0.05)', border: '1px solid rgba(211,163,118,0.2)' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(211,163,118,0.15)'; e.currentTarget.style.color = '#3E2522'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(211,163,118,0.05)'; e.currentTarget.style.color = '#8C6E63'; }}
+                >
+                  <span style={{ color: '#D3A376', marginRight: 8 }}>›</span>{s}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Middle — Lead Feed */}
-      <div className="flex-1 overflow-y-auto flex flex-col" style={{ background: '#FFF2DF' }}>
+      {/* Right — Lead Feed */}
+      <div className="flex-1 min-w-0 overflow-y-auto flex flex-col transition-all duration-300" style={{ background: '#FFF2DF' }}>
 
-        {/* Sticky compact search bar */}
-        <div className="px-5 py-3 sticky top-0 z-10" style={{ borderBottom: '1px solid #E8C9A0', background: 'rgba(255,242,223,0.97)', backdropFilter: 'blur(12px)' }}>
-          <div className="flex items-center gap-2">
-            <span style={{ fontFamily: 'var(--font-geist-mono)', fontSize: 11, letterSpacing: 2, color: '#B09080', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-              Social Intent
-            </span>
-            <div style={{ width: 1, height: 16, background: '#E8C9A0' }} />
-            <div className="flex gap-2 flex-1">
-              <input
-                type="text" value={keyword}
-                onChange={e => setKeyword(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleSearchSubmit(keyword)}
-                placeholder="New search..."
-                className="flex-1 px-4 py-2 rounded-lg text-sm focus:outline-none transition-all"
-                style={{ background: '#FFF8EF', border: '1px solid #E8C9A0', color: '#3E2522' }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#D3A376')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#E8C9A0')}
-              />
-              <button onClick={() => handleSearchSubmit(keyword)}
-                disabled={loading || !keyword.trim()}
-                className="px-4 py-2 rounded-lg flex items-center gap-1.5 text-sm font-semibold transition-all disabled:opacity-40"
-                style={{ background: '#3E2522', color: '#FFF2DF', whiteSpace: 'nowrap' }}
-                onMouseEnter={e => { if (!loading && keyword.trim()) e.currentTarget.style.background = '#5A2E28'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#3E2522'; }}
-              >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                Search
-              </button>
-            </div>
+        <div className="px-8 pt-8 pb-6 sticky top-0 z-10" style={{ borderBottom: '1px solid #E8C9A0', background: 'rgba(255,242,223,0.97)', backdropFilter: 'blur(12px)' }}>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1" style={{ color: '#3E2522' }}>Social Intent</h1>
+          <p className="text-sm text-slate-500 mb-6" style={{ color: '#8C6E63' }}>Find prospects actively discussing your keywords on LinkedIn</p>
+
+          <div className="flex gap-3">
+            <input
+              type="text" value={keyword}
+              onChange={e => setKeyword(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handleSearchSubmit(keyword)}
+              placeholder="New search..."
+              className="flex-1 px-5 py-3 rounded-xl text-base focus:outline-none transition-all"
+              style={{ background: '#FFF8EF', border: '1px solid #E8C9A0', color: '#3E2522' }}
+              onFocus={e => (e.currentTarget.style.borderColor = '#D3A376')}
+              onBlur={e => (e.currentTarget.style.borderColor = '#E8C9A0')}
+            />
+            <button onClick={() => handleSearchSubmit(keyword)}
+              disabled={loading || !keyword.trim()}
+              className="px-6 py-3 rounded-xl flex items-center gap-2 text-base font-semibold transition-all disabled:opacity-40"
+              style={{ background: '#3E2522', color: '#FFF2DF', whiteSpace: 'nowrap' }}
+              onMouseEnter={e => { if (!loading && keyword.trim()) e.currentTarget.style.background = '#5A2E28'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#3E2522'; }}
+            >
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+              Search
+            </button>
           </div>
         </div>
 
-        {/* Results */}
-        <div className="px-5 py-4 flex-1">
+        {/* Results Grid */}
+        <div className="px-8 py-6 flex-1 max-w-4xl w-full mx-auto">
           {loading ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[1, 2, 3].map(i => (
-                <div key={i} className="rounded-xl p-5 animate-pulse" style={{ background: '#FFEBD0', border: '1px solid #E8C9A0' }}>
-                  <div className="h-5 rounded w-48 mb-2" style={{ background: '#F0D8B8' }}></div>
-                  <div className="h-4 rounded w-32 mb-3" style={{ background: '#E8C9A0' }}></div>
-                  <div className="h-8 rounded" style={{ background: '#F0D8B8' }}></div>
+                <div key={i} className="rounded-xl p-5 animate-pulse flex gap-4" style={{ background: '#FFEBD0', border: '1px solid #E8C9A0' }}>
+                  <div className="w-12 h-12 rounded-full" style={{ background: '#F0D8B8' }} />
+                  <div className="flex-1">
+                    <div className="h-5 rounded w-48 mb-2" style={{ background: '#F0D8B8' }}></div>
+                    <div className="h-4 rounded w-32 mb-4" style={{ background: '#E8C9A0' }}></div>
+                    <div className="h-4 rounded w-full mb-2" style={{ background: '#E8C9A0' }}></div>
+                    <div className="h-4 rounded w-3/4" style={{ background: '#F0D8B8' }}></div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -293,26 +306,42 @@ export default function SocialIntentAgent() {
               <p className="text-sm" style={{ fontFamily: 'var(--font-geist-mono)', color: '#B09080' }}>No leads found — try a different keyword</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-4">
               {leads.map((lead, idx) => (
                 <div key={idx} onClick={() => setSelectedLead(lead)}
-                  className="rounded-xl p-5 cursor-pointer transition-all"
+                  className="rounded-xl p-5 cursor-pointer transition-all flex gap-4"
                   style={{
-                    background: selectedLead?.prospectName === lead.prospectName ? '#FFEBD0' : '#FFF8EF',
-                    border: `1px solid ${selectedLead?.prospectName === lead.prospectName ? '#D3A376' : '#E8C9A0'}`,
-                    boxShadow: selectedLead?.prospectName === lead.prospectName ? '0 2px 12px rgba(211,163,118,0.18)' : 'none',
+                    background: '#FFF8EF',
+                    border: '1px solid #E8C9A0',
                   }}
-                  onMouseEnter={e => { if (selectedLead?.prospectName !== lead.prospectName) e.currentTarget.style.borderColor = '#D3A376'; }}
-                  onMouseLeave={e => { if (selectedLead?.prospectName !== lead.prospectName) e.currentTarget.style.borderColor = '#E8C9A0'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#D3A376'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(211,163,118,0.15)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8C9A0'; e.currentTarget.style.boxShadow = 'none'; }}
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="text-base font-semibold" style={{ color: '#3E2522' }}>{lead.prospectName}</h3>
-                      <p className="text-sm mt-0.5" style={{ color: '#8C6E63' }}>{lead.role} at {lead.company}</p>
-                    </div>
-                    {getIntentBadge(lead.intentScore)}
+                  <div className="shrink-0">
+                    {lead.authorAvatar ? (
+                      <img src={lead.authorAvatar} alt={lead.prospectName} className="w-12 h-12 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold" style={{ background: 'rgba(211,163,118,0.2)', color: '#3E2522' }}>
+                        {getInitials(lead.prospectName)}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm mt-3 line-clamp-2" style={{ color: '#B09080' }}>{lead.signal}</p>
+                  <div className="flex-1 min-w-0">
+                     <div className="flex justify-between items-start">
+                       <div>
+                         <h3 className="text-base font-bold text-slate-900 truncate">{lead.prospectName}</h3>
+                         <p className="text-sm text-slate-500 truncate" style={{ color: '#8C6E63' }}>{lead.role}</p>
+                       </div>
+                       {getIntentBadge(lead.intentScore)}
+                     </div>
+                     <p className="text-sm text-slate-600 mt-2 line-clamp-2" style={{ color: '#3E2522' }}>{lead.postText || lead.signal}</p>
+                     
+                     <div className="flex items-center gap-4 mt-4 text-xs font-medium text-slate-500" style={{ color: '#B09080' }}>
+                       <span className="flex items-center gap-1.5"><ThumbsUp className="w-3.5 h-3.5" /> {lead.likesCount}</span>
+                       <span className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5" /> {lead.commentsCount}</span>
+                       <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {lead.postedAt}</span>
+                     </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -320,78 +349,86 @@ export default function SocialIntentAgent() {
         </div>
       </div>
 
-      {/* Right — Lead Detail */}
-      <div className="w-96 overflow-y-auto shrink-0" style={{ borderLeft: '1px solid #E8C9A0', background: '#FFF8EF' }}>
-        {!selectedLead ? (
-          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-            <User className="w-10 h-10 mb-3 opacity-20" style={{ color: '#D3A376' }} />
-            <p className="text-sm" style={{ fontFamily: 'var(--font-geist-mono)', color: '#B09080' }}>Select a lead to view details</p>
-          </div>
-        ) : (
-          <div className="flex flex-col min-h-full">
-            {/* Header */}
-            <div className="px-6 py-5" style={{ borderBottom: '1px solid #F0D8B8' }}>
-              <div className="flex items-start justify-between gap-3">
+      {/* Slide-in Sidebar (Push layout) */}
+      <div className={`flex-shrink-0 overflow-y-auto transition-all duration-300 ease-in-out ${
+        selectedLead ? 'w-[420px]' : 'w-0'
+      }`} style={{ background: '#FFF8EF', borderLeft: selectedLead ? '1px solid #E8C9A0' : 'none' }}>
+        {selectedLead && (
+          <div className="w-[420px] p-6 relative">
+              <button onClick={() => setSelectedLead(null)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-black/5 transition-colors">
+                <X className="w-5 h-5" style={{ color: '#8C6E63' }} />
+              </button>
+
+              <div className="flex items-center gap-5 mt-2 mb-6">
+                {selectedLead.authorAvatar ? (
+                  <img src={selectedLead.authorAvatar} alt={selectedLead.prospectName} className="w-16 h-16 rounded-full object-cover shadow-sm" />
+                ) : (
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold shadow-sm" style={{ background: 'rgba(211,163,118,0.2)', color: '#3E2522' }}>
+                    {getInitials(selectedLead.prospectName)}
+                  </div>
+                )}
                 <div>
                   <h2 className="text-xl font-bold" style={{ color: '#3E2522' }}>{selectedLead.prospectName}</h2>
-                  <p className="text-sm mt-1" style={{ color: '#8C6E63' }}>{selectedLead.role} at {selectedLead.company}</p>
-                </div>
-                {getIntentBadge(selectedLead.intentScore)}
-              </div>
-              {/* Score bar */}
-              <div className="mt-4">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Intent Score</span>
-                  <span className="text-sm font-bold" style={{ color: selectedLead.intentScore >= 75 ? '#C0614A' : selectedLead.intentScore >= 50 ? '#D3A376' : '#B09080' }}>
-                    {selectedLead.intentScore} / 100
-                  </span>
-                </div>
-                <div style={{ height: 6, background: '#F0D8B8', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%', borderRadius: 3,
-                    width: `${selectedLead.intentScore}%`,
-                    background: selectedLead.intentScore >= 75
-                      ? 'linear-gradient(90deg, #C0614A, #D3A376)'
-                      : selectedLead.intentScore >= 50
-                      ? 'linear-gradient(90deg, #D3A376, #E8C9A0)'
-                      : '#E8C9A0',
-                    transition: 'width 600ms ease',
-                  }} />
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Signal */}
-              <div>
-                <h4 className="text-[10px] font-semibold uppercase tracking-widest mb-2" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Intent Signal</h4>
-                <div className="rounded-lg p-4 text-sm leading-relaxed" style={{ background: '#FFEBD0', border: '1px solid #E8C9A0', color: '#8C6E63' }}>
-                  {selectedLead.signal}
+                  <p className="text-sm text-slate-500 mb-2" style={{ color: '#8C6E63' }}>{selectedLead.role}</p>
+                  {getIntentBadge(selectedLead.intentScore)}
                 </div>
               </div>
 
-              {/* Profile link */}
+              <div style={{ borderTop: '1px solid #F0D8B8', margin: '24px 0' }} />
+
               <div>
-                <h4 className="text-[10px] font-semibold uppercase tracking-widest mb-2" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Social Profile</h4>
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>LINKEDIN POST</h3>
+                <div className="max-h-48 overflow-y-auto bg-slate-50 rounded-lg p-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed shadow-inner" style={{ background: '#FFEBD0', color: '#3E2522', border: '1px solid #E8C9A0' }}>
+                  {selectedLead.postText || selectedLead.signal}
+                </div>
                 <a href={selectedLead.postUrl} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
-                  style={{ color: '#D3A376' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#3E2522')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#D3A376')}
+                  className="mt-4 w-full py-2.5 rounded-lg flex justify-center items-center gap-2 text-sm font-semibold transition-all"
+                  style={{ border: '1px solid #D3A376', color: '#D3A376', background: 'transparent' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(211,163,118,0.1)'; e.currentTarget.style.color = '#3E2522'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#D3A376'; }}
                 >
-                  <ExternalLink className="w-4 h-4" /> View LinkedIn Profile
+                  <ExternalLink className="w-4 h-4" /> View Full Post
                 </a>
               </div>
 
-              <div style={{ borderTop: '1px solid #F0D8B8' }} />
+              <div style={{ borderTop: '1px solid #F0D8B8', margin: '24px 0' }} />
 
-              {/* Call */}
+              <div className="flex justify-around items-center text-sm font-medium" style={{ color: '#8C6E63' }}>
+                <div className="flex flex-col items-center gap-1">
+                  <ThumbsUp className="w-5 h-5 mb-1" style={{ color: '#D3A376' }} />
+                  <span>{selectedLead.likesCount} Likes</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <MessageSquare className="w-5 h-5 mb-1" style={{ color: '#D3A376' }} />
+                  <span>{selectedLead.commentsCount} Comments</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Clock className="w-5 h-5 mb-1" style={{ color: '#D3A376' }} />
+                  <span>{selectedLead.postedAt}</span>
+                </div>
+              </div>
+
+              <div style={{ borderTop: '1px solid #F0D8B8', margin: '24px 0' }} />
+
               <div>
-                <h4 className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Initiate Voice Call</h4>
+                <a href={selectedLead.authorLinkedinUrl || selectedLead.postUrl} target="_blank" rel="noopener noreferrer"
+                  className="w-full py-3 rounded-xl flex justify-center items-center gap-2 text-sm font-semibold transition-all"
+                  style={{ background: '#3E2522', color: '#FFF2DF' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#5A2E28'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#3E2522'; }}
+                >
+                  View LinkedIn Profile
+                </a>
+              </div>
+
+              <div style={{ borderTop: '1px solid #F0D8B8', margin: '24px 0' }} />
+
+              <div>
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Initiate Voice Call</h3>
                 <div className="flex flex-col gap-3">
                   <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
                     placeholder="+1 (555) 000-0000"
-                    className="px-4 py-2.5 rounded-lg text-sm focus:outline-none transition-all"
+                    className="px-4 py-3 rounded-xl text-sm focus:outline-none transition-all"
                     style={{ background: '#FFEBD0', border: '1px solid #E8C9A0', color: '#3E2522' }}
                     onFocus={e => (e.currentTarget.style.borderColor = '#D3A376')}
                     onBlur={e => (e.currentTarget.style.borderColor = '#E8C9A0')}
@@ -405,7 +442,7 @@ export default function SocialIntentAgent() {
                     {callLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Initiating...</> : <><Phone className="w-4 h-4" /> Call This Lead</>}
                   </button>
                   {callStatus && (
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-2">
                       <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Status</span>
                       <div className="flex items-center gap-2">
                         {getCallStatusBadge(callStatus)}
@@ -416,31 +453,10 @@ export default function SocialIntentAgent() {
                 </div>
               </div>
 
-              {callLogs.length > 0 && (
-                <>
-                  <div style={{ borderTop: '1px solid #F0D8B8' }} />
-                  <div>
-                    <h4 className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Voice Agent Log</h4>
-                    <div className="flex flex-col">
-                      {callLogs.map((log, idx) => (
-                        <div key={idx} className="flex items-center justify-between py-2.5" style={{ borderBottom: '1px solid #F0D8B8' }}>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium" style={{ color: '#3E2522' }}>{log.prospectName}</span>
-                            <span className="text-[10px] font-mono" style={{ color: '#B09080' }}>
-                              {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · {log.callId.slice(0, 8)}...
-                            </span>
-                          </div>
-                          {getCallStatusBadge(log.status)}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
             </div>
-          </div>
         )}
       </div>
+
     </div>
   );
 }
