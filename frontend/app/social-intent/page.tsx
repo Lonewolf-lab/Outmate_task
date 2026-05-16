@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { runSearch, initiateCall } from "@/lib/api";
 import { Lead, mapLeads } from "@/lib/mappers";
-import { Clock, Search, User, Loader2, Phone, ExternalLink, Flame, Zap, Snowflake, ArrowRight, X, ThumbsUp, MessageSquare } from "lucide-react";
+import { Clock, Search, User, Loader2, Phone, ExternalLink, TrendingUp, Minus, TrendingDown, ArrowRight, X, ThumbsUp, MessageSquare } from "lucide-react";
 
 interface CallLog {
   callId: string;
@@ -79,20 +79,65 @@ export default function SocialIntentAgent() {
   };
 
   const getIntentBadge = (score: number) => {
-    if (score >= 75) return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(192,97,74,0.12)', border: '1px solid rgba(192,97,74,0.4)', color: '#C0614A' }}>
-        <Flame className="w-3 h-3" /> Hot
+    if (score >= 70) return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+        <TrendingUp className="w-3 h-3" /> High
       </span>
     );
-    if (score >= 50) return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(211,163,118,0.15)', border: '1px solid rgba(211,163,118,0.5)', color: '#8C6E63' }}>
-        <Zap className="w-3 h-3" /> Warm
+    if (score >= 40) return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+        <Minus className="w-3 h-3" /> Medium
       </span>
     );
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(176,144,128,0.15)', border: '1px solid rgba(176,144,128,0.4)', color: '#B09080' }}>
-        <Snowflake className="w-3 h-3" /> Cold
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+        <TrendingDown className="w-3 h-3" /> Low
       </span>
+    );
+  };
+
+  const getSidebarIntentDisplay = (score: number) => {
+    let styleClass = "";
+    let Icon = TrendingDown;
+    let label = "Low";
+
+    if (score >= 70) {
+      styleClass = "bg-green-50 text-green-700 border-green-200";
+      Icon = TrendingUp;
+      label = "High";
+    } else if (score >= 40) {
+      styleClass = "bg-amber-50 text-amber-700 border-amber-200";
+      Icon = Minus;
+      label = "Medium";
+    } else {
+      styleClass = "bg-slate-50 text-slate-600 border-slate-200";
+      Icon = TrendingDown;
+      label = "Low";
+    }
+
+    return (
+      <div className="mb-5">
+        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-4 ${styleClass}`}>
+          <Icon className="w-3.5 h-3.5" />
+          <span className="text-xs font-semibold">{label}</span>
+        </div>
+        {/* Intent Score Bar */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Intent Score</span>
+            <span className="text-sm font-bold text-slate-900">{score}/100</span>
+          </div>
+          <div className="w-full bg-slate-100 rounded-full h-2">
+            <div
+              className="h-2 rounded-full transition-all duration-500"
+              style={{
+                width: `${score}%`,
+                backgroundColor: '#3E2522'
+              }}
+            />
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -327,19 +372,19 @@ export default function SocialIntentAgent() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                     <div className="flex justify-between items-start">
-                       <div>
-                         <h3 className="text-base font-bold text-slate-900 truncate">{lead.prospectName}</h3>
-                         <p className="text-sm text-slate-500 truncate" style={{ color: '#8C6E63' }}>{lead.role}</p>
+                     <div className="flex justify-between items-start gap-2">
+                       <div className="min-w-0 flex-1">
+                         <h3 className="text-base font-bold text-slate-900 truncate overflow-hidden">{lead.prospectName}</h3>
+                         <p className="text-sm text-slate-500 truncate overflow-hidden" style={{ color: '#8C6E63' }}>{lead.role}</p>
                        </div>
-                       {getIntentBadge(lead.intentScore)}
+                       <div className="shrink-0">{getIntentBadge(lead.intentScore)}</div>
                      </div>
-                     <p className="text-sm text-slate-600 mt-2 line-clamp-2" style={{ color: '#3E2522' }}>{lead.postText || lead.signal}</p>
+                     <p className="text-[14px] font-medium mt-2 line-clamp-2" style={{ color: '#1F1211' }}>{lead.postText || lead.signal}</p>
                      
                      <div className="flex items-center gap-4 mt-4 text-xs font-medium text-slate-500" style={{ color: '#B09080' }}>
                        <span className="flex items-center gap-1.5"><ThumbsUp className="w-3.5 h-3.5" /> {lead.likesCount}</span>
                        <span className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5" /> {lead.commentsCount}</span>
-                       <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {lead.postedAt}</span>
+                       <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {lead.postedAt?.split(' • ')[0] || ''}</span>
                      </div>
                   </div>
                 </div>
@@ -369,23 +414,23 @@ export default function SocialIntentAgent() {
                 )}
                 <div>
                   <h2 className="text-xl font-bold" style={{ color: '#3E2522' }}>{selectedLead.prospectName}</h2>
-                  <p className="text-sm text-slate-500 mb-2" style={{ color: '#8C6E63' }}>{selectedLead.role}</p>
-                  {getIntentBadge(selectedLead.intentScore)}
+                  <p className="text-sm text-slate-500" style={{ color: '#8C6E63' }}>{selectedLead.role}</p>
                 </div>
               </div>
 
               <div style={{ borderTop: '1px solid #F0D8B8', margin: '24px 0' }} />
 
               <div>
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>LINKEDIN POST</h3>
-                <div className="max-h-48 overflow-y-auto bg-slate-50 rounded-lg p-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed shadow-inner" style={{ background: '#FFEBD0', color: '#3E2522', border: '1px solid #E8C9A0' }}>
+                {getSidebarIntentDisplay(selectedLead.intentScore)}
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3" style={{ color: '#3E2522', fontFamily: 'var(--font-geist-mono)' }}>LINKEDIN POST</h3>
+                <div className="max-h-48 overflow-y-auto rounded-lg p-4 text-[15px] font-medium whitespace-pre-wrap leading-relaxed shadow-inner" style={{ background: '#FFEBD0', color: '#1F1211', border: '1px solid #E8C9A0' }}>
                   {selectedLead.postText || selectedLead.signal}
                 </div>
                 <a href={selectedLead.postUrl} target="_blank" rel="noopener noreferrer"
                   className="mt-4 w-full py-2.5 rounded-lg flex justify-center items-center gap-2 text-sm font-semibold transition-all"
-                  style={{ border: '1px solid #D3A376', color: '#D3A376', background: 'transparent' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(211,163,118,0.1)'; e.currentTarget.style.color = '#3E2522'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#D3A376'; }}
+                  style={{ border: '1px solid #3E2522', color: '#3E2522', background: 'transparent' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#3E2522'; e.currentTarget.style.color = '#FFF2DF'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#3E2522'; }}
                 >
                   <ExternalLink className="w-4 h-4" /> View Full Post
                 </a>
@@ -393,18 +438,18 @@ export default function SocialIntentAgent() {
 
               <div style={{ borderTop: '1px solid #F0D8B8', margin: '24px 0' }} />
 
-              <div className="flex justify-around items-center text-sm font-medium" style={{ color: '#8C6E63' }}>
-                <div className="flex flex-col items-center gap-1">
-                  <ThumbsUp className="w-5 h-5 mb-1" style={{ color: '#D3A376' }} />
-                  <span>{selectedLead.likesCount} Likes</span>
+              <div className="flex justify-between items-center text-sm font-medium px-4" style={{ color: '#3E2522' }}>
+                <div className="flex items-center gap-2">
+                  <ThumbsUp className="w-[14px] h-[14px]" style={{ color: '#3E2522' }} />
+                  <span className="whitespace-nowrap">{selectedLead.likesCount} Likes</span>
                 </div>
-                <div className="flex flex-col items-center gap-1">
-                  <MessageSquare className="w-5 h-5 mb-1" style={{ color: '#D3A376' }} />
-                  <span>{selectedLead.commentsCount} Comments</span>
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-[14px] h-[14px]" style={{ color: '#3E2522' }} />
+                  <span className="whitespace-nowrap">{selectedLead.commentsCount} Comments</span>
                 </div>
-                <div className="flex flex-col items-center gap-1">
-                  <Clock className="w-5 h-5 mb-1" style={{ color: '#D3A376' }} />
-                  <span>{selectedLead.postedAt}</span>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-[14px] h-[14px]" style={{ color: '#3E2522' }} />
+                  <span className="whitespace-nowrap">{selectedLead.postedAt?.split(' • ')[0] || ''}</span>
                 </div>
               </div>
 
@@ -421,37 +466,7 @@ export default function SocialIntentAgent() {
                 </a>
               </div>
 
-              <div style={{ borderTop: '1px solid #F0D8B8', margin: '24px 0' }} />
 
-              <div>
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Initiate Voice Call</h3>
-                <div className="flex flex-col gap-3">
-                  <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                    placeholder="+1 (555) 000-0000"
-                    className="px-4 py-3 rounded-xl text-sm focus:outline-none transition-all"
-                    style={{ background: '#FFEBD0', border: '1px solid #E8C9A0', color: '#3E2522' }}
-                    onFocus={e => (e.currentTarget.style.borderColor = '#D3A376')}
-                    onBlur={e => (e.currentTarget.style.borderColor = '#E8C9A0')}
-                  />
-                  <button onClick={handleCall} disabled={callLoading || !phone.trim()}
-                    className="w-full py-3 rounded-xl flex justify-center items-center gap-2 text-sm font-semibold transition-all disabled:opacity-40"
-                    style={{ background: '#3E2522', color: '#FFF2DF' }}
-                    onMouseEnter={e => { if (!callLoading && phone.trim()) e.currentTarget.style.background = '#5A2E28'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#3E2522'; }}
-                  >
-                    {callLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Initiating...</> : <><Phone className="w-4 h-4" /> Call This Lead</>}
-                  </button>
-                  {callStatus && (
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#B09080', fontFamily: 'var(--font-geist-mono)' }}>Status</span>
-                      <div className="flex items-center gap-2">
-                        {getCallStatusBadge(callStatus)}
-                        {callId && <span className="text-[10px] font-mono" style={{ color: '#B09080' }}>ID: {callId.slice(0, 8)}...</span>}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
 
             </div>
         )}
